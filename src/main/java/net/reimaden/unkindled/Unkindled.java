@@ -3,32 +3,32 @@ package net.reimaden.unkindled;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.block.AbstractFurnaceBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.event.GameEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.AbstractFurnaceBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.reimaden.unkindled.util.FurnaceUtil;
 import net.reimaden.unkindled.util.Igniter;
 
 public class Unkindled implements ModInitializer {
     public static final String MOD_ID = "unkindled";
-    public static final TagKey<Block> NEEDS_IGNITING = TagKey.of(RegistryKeys.BLOCK, id("needs_igniting"));
-    public static final TagKey<Item> SELF_IGNITING_FUEL = TagKey.of(RegistryKeys.ITEM, id("self_igniting_fuel"));
+    public static final TagKey<Block> NEEDS_IGNITING = TagKey.create(Registries.BLOCK, id("needs_igniting"));
+    public static final TagKey<Item> SELF_IGNITING_FUEL = TagKey.create(Registries.ITEM, id("self_igniting_fuel"));
 
     @Override
     public void onInitialize() {
@@ -37,19 +37,19 @@ public class Unkindled implements ModInitializer {
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             final BlockPos pos = hitResult.getBlockPos();
             final BlockState state = world.getBlockState(pos);
-            if (!FurnaceUtil.canBeLit(state) || !player.isSneaking() || player.isSpectator()) return ActionResult.PASS;
+            if (!FurnaceUtil.canBeLit(state) || !player.isShiftKeyDown() || player.isSpectator()) return InteractionResult.PASS;
 
-            final ItemStack stack = player.getStackInHand(hand);
-            final boolean isFireCharge = stack.isOf(Items.FIRE_CHARGE);
+            final ItemStack stack = player.getItemInHand(hand);
+            final boolean isFireCharge = stack.is(Items.FIRE_CHARGE);
 
-            if (stack.isIn(ConventionalItemTags.IGNITER_TOOLS) || isFireCharge) {
-                final Random random = world.getRandom();
-                final SoundEvent sound = isFireCharge ? SoundEvents.ITEM_FIRECHARGE_USE : SoundEvents.ITEM_FLINTANDSTEEL_USE;
+            if (stack.is(ConventionalItemTags.IGNITER_TOOLS) || isFireCharge) {
+                final RandomSource random = world.getRandom();
+                final SoundEvent sound = isFireCharge ? SoundEvents.FIRECHARGE_USE : SoundEvents.FLINTANDSTEEL_USE;
                 float pitch = isFireCharge ? (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F : random.nextFloat() * 0.4F + 0.8F;
 
-                world.playSound(player, pos, sound, SoundCategory.BLOCKS, 1.0F, pitch);
-                world.setBlockState(pos, state.with(AbstractFurnaceBlock.LIT, true), Block.NOTIFY_ALL_AND_REDRAW);
-                world.emitGameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+                world.playSound(player, pos, sound, SoundSource.BLOCKS, 1.0F, pitch);
+                world.setBlock(pos, state.setValue(AbstractFurnaceBlock.LIT, true), Block.UPDATE_ALL_IMMEDIATE);
+                world.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
 
                 final BlockEntity blockEntity = world.getBlockEntity(pos);
                 // Sanity check
@@ -58,19 +58,19 @@ public class Unkindled implements ModInitializer {
                 }
 
                 if (isFireCharge) {
-                    stack.decrementUnlessCreative(1, player);
+                    stack.consume(1, player);
                 } else {
-                    stack.damage(1, player, LivingEntity.getSlotForHand(hand));
+                    stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
                 }
 
-                return ActionResult.success(world.isClient());
+                return InteractionResult.sidedSuccess(world.isClientSide());
             }
 
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         });
     }
 
-    public static Identifier id(String path) {
-        return Identifier.of(MOD_ID, path);
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 }
