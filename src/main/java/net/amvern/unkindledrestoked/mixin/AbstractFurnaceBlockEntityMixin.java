@@ -3,14 +3,13 @@ package net.amvern.unkindledrestoked.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.amvern.unkindledrestoked.UnkindledRestoked;
 import net.amvern.unkindledrestoked.util.Igniter;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,11 +37,12 @@ public abstract class AbstractFurnaceBlockEntityMixin implements Igniter {
             method = "serverTick",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;canBurn(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/item/crafting/RecipeHolder;Lnet/minecraft/world/item/crafting/SingleRecipeInput;Lnet/minecraft/core/NonNullList;I)Z"
-        )
+                    target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;canBurn(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/item/crafting/Recipe;Lnet/minecraft/core/NonNullList;I)Z"
+            )
     )
-    private static boolean unkindledrestoked$requiresIgniting(boolean original, @Local AbstractFurnaceBlockEntity blockEntity, @Local(ordinal = 0) ItemStack stack) {
-        if (!blockEntity.getBlockState().is(UnkindledRestoked.NEEDS_IGNITING) || stack.is(UnkindledRestoked.SELF_IGNITING_FUEL)) {
+    private static boolean unkindled$requiresIgniting(boolean original, Level level, BlockPos pos, BlockState state,
+                                                      AbstractFurnaceBlockEntity blockEntity, @Local(ordinal = 0) ItemStack stack) {
+        if (!state.is(UnkindledRestoked.NEEDS_IGNITING) || stack.is(UnkindledRestoked.SELF_IGNITING_FUEL)) {
             return original;
         }
         return original && ((Igniter) blockEntity).unkindledrestoked$isIgnited();
@@ -54,26 +54,27 @@ public abstract class AbstractFurnaceBlockEntityMixin implements Igniter {
                     "TAIL"
             )
     )
-    private static void unkindledrestoked$setUnignited(ServerLevel serverLevel, BlockPos blockPos, BlockState blockState, AbstractFurnaceBlockEntity abstractFurnaceBlockEntity, CallbackInfo ci) {
-        if (!blockState.getValue(AbstractFurnaceBlock.LIT)) {
-            if (((AbstractFurnaceBlockEntityAccessor) abstractFurnaceBlockEntity).unkindledrestoked$cookingTotalTime() > 0) {
+    private static void unkindled$setUnignited(Level level, BlockPos pos, BlockState state,
+                                               AbstractFurnaceBlockEntity blockEntity, CallbackInfo ci) {
+        if (!state.getValue(AbstractFurnaceBlock.LIT)) {
+            if (((AbstractFurnaceBlockEntityAccessor) blockEntity).unkindledrestoked$cookingTotalTime() > 0) {
                 return;
             }
-            ((Igniter) abstractFurnaceBlockEntity).unkindledrestoked$setIgnited(false);
-        } else if (!((AbstractFurnaceBlockEntityAccessor) abstractFurnaceBlockEntity).unkindledrestoked$isLit()) {
-            blockState = blockState.setValue(AbstractFurnaceBlock.LIT, false);
-            serverLevel.setBlock(blockPos, blockState, Block.UPDATE_ALL);
+            ((Igniter) blockEntity).unkindledrestoked$setIgnited(false);
+        } else if (!((AbstractFurnaceBlockEntityAccessor) blockEntity).unkindledrestoked$isLit()) {
+            state = state.setValue(AbstractFurnaceBlock.LIT, false);
+            level.setBlock(pos, state, Block.UPDATE_ALL);
         }
     }
 
     @Inject(
-            method = "loadAdditional",
+            method = "load",
             at = @At(
                     "TAIL"
             )
     )
-    private void unkindledrestoked$readNbt(ValueInput valueInput, CallbackInfo ci) {
-        this.unkindledrestoked$ignited = valueInput.getBooleanOr("Ignited", false);
+    private void unkindled$readNbt(CompoundTag compoundTag, CallbackInfo ci) {
+        this.unkindledrestoked$ignited = compoundTag.getBoolean("Ignited");
     }
 
     @Inject(
@@ -82,7 +83,7 @@ public abstract class AbstractFurnaceBlockEntityMixin implements Igniter {
                     "TAIL"
             )
     )
-    private void unkindledrestoked$writeNbt(ValueOutput valueOutput, CallbackInfo ci) {
-        valueOutput.putBoolean("Ignited", this.unkindledrestoked$ignited);
+    private void unkindled$writeNbt(CompoundTag compoundTag, CallbackInfo ci) {
+        compoundTag.putBoolean("Ignited", this.unkindledrestoked$ignited);
     }
 }

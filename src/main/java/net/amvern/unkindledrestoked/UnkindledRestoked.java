@@ -2,13 +2,14 @@ package net.amvern.unkindledrestoked;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
@@ -24,10 +25,14 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.amvern.unkindledrestoked.util.FurnaceUtil;
 import net.amvern.unkindledrestoked.util.Igniter;
 
+import java.util.logging.Logger;
+
 public class UnkindledRestoked implements ModInitializer {
     public static final String MOD_ID = "unkindledrestoked";
-    public static final TagKey<Block> NEEDS_IGNITING = TagKey.create(Registries.BLOCK, id("needs_igniting"));
-    public static final TagKey<Item> SELF_IGNITING_FUEL = TagKey.create(Registries.ITEM, id("self_igniting_fuel"));
+    public static final Logger LOGGER = Logger.getLogger(MOD_ID);
+    public static final TagKey<Block> NEEDS_IGNITING = TagKey.create(Registries.BLOCK, new ResourceLocation(MOD_ID,"needs_igniting"));
+    public static final TagKey<Item> SELF_IGNITING_FUEL = TagKey.create(Registries.ITEM, new ResourceLocation(MOD_ID,"self_igniting_fuel"));
+
 
     @Override
     public void onInitialize() {
@@ -41,7 +46,7 @@ public class UnkindledRestoked implements ModInitializer {
             final ItemStack stack = player.getItemInHand(hand);
             final boolean isFireCharge = stack.is(Items.FIRE_CHARGE);
 
-            if (stack.is(ConventionalItemTags.IGNITER_TOOLS) || isFireCharge) {
+            if (stack.is(ItemTags.CREEPER_IGNITERS) || isFireCharge) {
                 final RandomSource random = world.getRandom();
                 final SoundEvent sound = isFireCharge ? SoundEvents.FIRECHARGE_USE : SoundEvents.FLINTANDSTEEL_USE;
                 float pitch = isFireCharge ? (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F : random.nextFloat() * 0.4F + 0.8F;
@@ -57,9 +62,10 @@ public class UnkindledRestoked implements ModInitializer {
                 }
 
                 if (isFireCharge) {
-                    stack.consume(1, player);
+                    stack.shrink(1);
+                    player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
                 } else {
-                    stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
+                    stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
                 }
 
                 return InteractionResult.SUCCESS;
@@ -69,7 +75,4 @@ public class UnkindledRestoked implements ModInitializer {
         });
     }
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
-    }
 }

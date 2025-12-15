@@ -3,7 +3,7 @@ package net.amvern.unkindledrestoked.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.BlockSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets = "net.minecraft.core.dispenser.DispenseItemBehavior$6")
+@Mixin(targets = "net.minecraft.core.dispenser.DispenseItemBehavior$18")
 public abstract class FlintAndSteelDispenserBehaviorMixin {
     @ModifyExpressionValue(
             method = "execute",
@@ -32,11 +32,11 @@ public abstract class FlintAndSteelDispenserBehaviorMixin {
             method = "execute",
             at = @At(
                     value = "FIELD",
-                    target = "Lnet/minecraft/world/level/gameevent/GameEvent;BLOCK_CHANGE:Lnet/minecraft/core/Holder$Reference;"
+                    target = "Lnet/minecraft/world/level/gameevent/GameEvent;BLOCK_CHANGE:Lnet/minecraft/world/level/gameevent/GameEvent;"
             )
     )
-    private void unkindledrestoked$setIgnited(CallbackInfoReturnable<ItemStack> cir, @Local ServerLevel level, @Local BlockPos pos) {
-        BlockEntity blockEntity = level.getBlockEntity(pos);
+    private void unkindledrestoked$setIgnited(BlockSource blockSource, ItemStack itemStack, CallbackInfoReturnable<ItemStack> cir,  @Local BlockPos pos) {
+        BlockEntity blockEntity = blockSource.getLevel().getBlockEntity(pos);
         if (blockEntity instanceof AbstractFurnaceBlockEntity furnace) {
             ((Igniter) furnace).unkindledrestoked$setIgnited(true);
         }
