@@ -42,10 +42,11 @@ public abstract class AbstractFurnaceBlockEntityMixin implements Igniter {
     )
     private static boolean unkindled$requiresIgniting(boolean original, Level level, BlockPos pos, BlockState state,
                                                       AbstractFurnaceBlockEntity blockEntity, @Local(ordinal = 0) ItemStack stack) {
-        if (!state.is(UnkindledRestoked.NEEDS_IGNITING) || stack.is(UnkindledRestoked.SELF_IGNITING_FUEL)) {
+        if(!state.is(UnkindledRestoked.NEEDS_IGNITING) || stack.is(UnkindledRestoked.SELF_IGNITING_FUEL)) {
             return original;
+        } else {
+            return original && ((Igniter) blockEntity).unkindledrestoked$isIgnited();
         }
-        return original && ((Igniter) blockEntity).unkindledrestoked$isIgnited();
     }
 
     @Inject(
@@ -63,7 +64,7 @@ public abstract class AbstractFurnaceBlockEntityMixin implements Igniter {
             ((Igniter) blockEntity).unkindledrestoked$setIgnited(false);
         } else if (!((AbstractFurnaceBlockEntityAccessor) blockEntity).unkindledrestoked$isLit()) {
             state = state.setValue(AbstractFurnaceBlock.LIT, false);
-            level.setBlock(pos, state, Block.UPDATE_ALL);
+            level.setBlockAndUpdate(pos, state);
         }
     }
 
