@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "unkindled",
+  "id": "unkindled_restoked",
   "version": "${version}",
-  "name": "Unkindled",
-  "description": "Makes furnaces require manual ignition to work, and campfires are placed unlit.",
+  "name": "Unkindled: Restoked",
+  "description": "A revive of Unkindled, makes furnaces require manual ignition to work, and campfires are placed unlit.",
   "authors": [
-    "Maxmani"
+    "Amvern"
   ],
   "contact": {
     "homepage": "https://modrinth.com/mod/unkindled",
@@ -13,19 +13,19 @@
     "issues": "https://github.com/Reimaden-Modding/unkindled/issues"
   },
   "license": "MIT",
-  "icon": "assets/unkindled/icon.png",
+  "icon": "assets/unkindledrestoked/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.reimaden.unkindled.Unkindled"
+      "net.amvern.unkindledrestoked.UnkindledRestoked"
     ]
   },
   "mixins": [
-    "unkindled.mixins.json"
+    "unkindledrestoked.mixins.json"
   ],
   "depends": {
     "fabricloader": "*",
-    "minecraft": "~1.21",
+    "minecraft": "1.21.11",
     "java": ">=21",
     "fabric-api": "*"
   }

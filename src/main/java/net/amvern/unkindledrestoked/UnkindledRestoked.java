@@ -1,18 +1,17 @@
-package net.reimaden.unkindled;
+package net.amvern.unkindledrestoked;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -22,11 +21,11 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.reimaden.unkindled.util.FurnaceUtil;
-import net.reimaden.unkindled.util.Igniter;
+import net.amvern.unkindledrestoked.util.FurnaceUtil;
+import net.amvern.unkindledrestoked.util.Igniter;
 
-public class Unkindled implements ModInitializer {
-    public static final String MOD_ID = "unkindled";
+public class UnkindledRestoked implements ModInitializer {
+    public static final String MOD_ID = "unkindledrestoked";
     public static final TagKey<Block> NEEDS_IGNITING = TagKey.create(Registries.BLOCK, id("needs_igniting"));
     public static final TagKey<Item> SELF_IGNITING_FUEL = TagKey.create(Registries.ITEM, id("self_igniting_fuel"));
 
@@ -54,23 +53,23 @@ public class Unkindled implements ModInitializer {
                 final BlockEntity blockEntity = world.getBlockEntity(pos);
                 // Sanity check
                 if (blockEntity instanceof AbstractFurnaceBlockEntity furnace) {
-                    ((Igniter) furnace).unkindled$setIgnited(true);
+                    ((Igniter) furnace).unkindledrestoked$setIgnited(true);
                 }
 
                 if (isFireCharge) {
                     stack.consume(1, player);
                 } else {
-                    stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+                    stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
                 }
 
-                return InteractionResult.sidedSuccess(world.isClientSide());
+                return InteractionResult.SUCCESS;
             }
 
             return InteractionResult.PASS;
         });
     }
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 }

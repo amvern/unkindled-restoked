@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "net.reimaden.unkindled.mixin",
+  "package": "net.amvern.unkindledrestoked.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "AbstractFurnaceBlockEntityAccessor",

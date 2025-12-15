@@ -1,9 +1,9 @@
-package net.reimaden.unkindled.mixin;
+package net.amvern.unkindledrestoked.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.CampfireBlock;
-import net.reimaden.unkindled.Unkindled;
+import net.amvern.unkindledrestoked.UnkindledRestoked;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -21,7 +21,7 @@ public abstract class CampfireBlockMixin extends BaseEntityBlock {
                     target = "Ljava/lang/Boolean;valueOf(Z)Ljava/lang/Boolean;"
             )
     )
-    private Boolean unkindled$isUnlitByDefault(Boolean original) {
-        return original && !this.defaultBlockState().is(Unkindled.NEEDS_IGNITING);
+    private Boolean unkindledrestoked$isUnlitByDefault(Boolean original) {
+        return original && !this.defaultBlockState().is(UnkindledRestoked.NEEDS_IGNITING);
     }
 }
