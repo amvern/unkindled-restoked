@@ -3,7 +3,10 @@
     <img alt="fabric-api" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/requires/fabric-api_vector.svg">
 </p>
 
-Unkindled makes furnaces no longer smelt items automatically.
+Unkindled: Restoked is a revival of [Unkindled](https://modrinth.com/mod/unkindled/) by Maxmani. It's a 1:1 port for newer versions of Minecraft.
+
+This mod makes furnaces no longer smelt items automatically.
+
 Instead, players need to use a flint and steel (any tool in `c:tools/igniter`)
 or a fire charge to ignite the furnace (while sneaking).
 Furnaces will continue to burn as long as there is fuel in them.
