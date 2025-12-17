@@ -3,6 +3,7 @@ package net.amvern.unkindledrestoked;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -41,7 +42,11 @@ public class UnkindledRestoked implements ModInitializer {
             final ItemStack stack = player.getItemInHand(hand);
             final boolean isFireCharge = stack.is(Items.FIRE_CHARGE);
 
-            if (stack.is(ConventionalItemTags.IGNITER_TOOLS) || isFireCharge) {
+            boolean isFlintAndStone =
+                    stack.getItem().getDescriptionId().toString().equals("item.flintandstone.flint_and_stone")
+                            && FabricLoader.getInstance().isModLoaded("flintandstone");
+
+            if (stack.is(ConventionalItemTags.IGNITER_TOOLS) || isFireCharge || isFlintAndStone) {
                 final RandomSource random = world.getRandom();
                 final SoundEvent sound = isFireCharge ? SoundEvents.FIRECHARGE_USE : SoundEvents.FLINTANDSTEEL_USE;
                 float pitch = isFireCharge ? (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F : random.nextFloat() * 0.4F + 0.8F;
