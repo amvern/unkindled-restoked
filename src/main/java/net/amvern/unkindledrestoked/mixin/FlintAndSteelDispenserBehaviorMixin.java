@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets = "net.minecraft.core.dispenser.DispenseItemBehavior$6")
+@Mixin(targets = "net.minecraft.core.dispenser.DispenseItemBehavior$8")
 public abstract class FlintAndSteelDispenserBehaviorMixin {
     @ModifyExpressionValue(
             method = "execute",

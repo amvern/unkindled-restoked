@@ -59,7 +59,7 @@ public class UnkindledRestoked implements ModInitializer {
                 if (isFireCharge) {
                     stack.consume(1, player);
                 } else {
-                    stack.hurtAndBreak(1, player, hand.asEquipmentSlot());
+                    stack.hurtAndBreak(1, player, player.getEquipmentSlotForItem(stack));
                 }
 
                 return InteractionResult.SUCCESS;
