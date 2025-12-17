@@ -57,13 +57,7 @@ public abstract class AbstractFurnaceBlockEntityMixin implements Igniter {
     )
     private static void unkindledrestoked$setUnignited(Level level, BlockPos blockPos, BlockState blockState, AbstractFurnaceBlockEntity abstractFurnaceBlockEntity, CallbackInfo ci) {
         if (!blockState.getValue(AbstractFurnaceBlock.LIT)) {
-            if (((AbstractFurnaceBlockEntityAccessor) abstractFurnaceBlockEntity).unkindledrestoked$cookingTotalTime() > 0) {
-                return;
-            }
             ((Igniter) abstractFurnaceBlockEntity).unkindledrestoked$setIgnited(false);
-        } else if (!((AbstractFurnaceBlockEntityAccessor) abstractFurnaceBlockEntity).unkindledrestoked$isLit()) {
-            blockState = blockState.setValue(AbstractFurnaceBlock.LIT, false);
-            level.setBlock(blockPos, blockState, Block.UPDATE_ALL);
         }
     }
 
